@@ -61,6 +61,7 @@ class DelaunayTriangulation{
     void DeleteTri(int n, vector<Triangle> triangle);
     bool Iscirle(double x, double y, Triangle triangle);
     void DeleteFrame();
+    void Boundary_re(int startPoint, int endPoint);
     // bool operator ==(const Point &p)
     // {
     //     return (this->x == p.x ) && (this->y == p.y) && (this->z == p.z);
@@ -185,7 +186,7 @@ void DelaunayTriangulation::GenerateTri(Point v1, Point v2, Point v3){
 
 /***
  * @brief: AddPoint方法实现，用于加入点
- *         并且删除不合符条件的三角形，保留边康病生成新的三角形
+ *         并且删除不合符条件的三角形，保留边框生成新的三角形
 */
 bool DelaunayTriangulation::AddPoint(double x, double y, double z){
     vector<Edge> edgeFrame;                                                          //生成（删除三角形留下的）边框容器
@@ -267,6 +268,59 @@ void DelaunayTriangulation::DeleteFrame(){
     for (int i = 0; i < 4; i++){
         point.erase(point.begin());
     }
-    
+    //检查每一个三角形的第一个节点的索引值是否位0,1,2,3
+    //如果是则删除其三角形并删除边框，让i的值--(三角形的个数减少)
+    for (int i = 0; i < (int)triangle.size(); i++){
+        if (triangle[i].V[0].index == 0 || 
+            triangle[i].V[0].index == 1 || 
+            triangle[i].V[0].index == 2 || 
+            triangle[i].V[0].index == 3)
+        {
+            //DeleteTri
+            /**
+             * @brief 删除三角形功能还未规划实现
+             */
+            edgeFrame.resize(0);
+            i--;
+        }
+        //将其他点的位置向前移4个
+        else{
+            for (int j = 0; j< 3; j++)
+            {
+                triangle[i].V[j].index -= 4;
+                triangle[i].E[j].left.index -= 4;
+                triangle[i].E[j].right.index -= 4;
+            }
+        }
+    }
+    for (int i =0; i < 4; i++){                                 //利用迭代器删除前四条边元素
+        edge.erase(edge.begin());
+    }
+    int n = (int)edge.size();
+    for (int i = 0; i < n; i++){                                //循环将每条边左右节点的索引值进行更改（删除了前四个节点）
+        edge[i].left.index -= 4;
+        edge[i].right.index -= 4;
+    }
+}
 
+
+/**
+ * @brief boundary_re()恢复边界函数实现
+ *        用于实现超三角形的边界恢复
+ */
+
+void DelaunayTriangulation::Boundary_re(int startPoint, int endPoint){
+    vector<Edge> edgeFrame;
+    int n = edge.size();
+    for (int i = 0; i < n; i++){
+        if (triangle[i].V[0].index >= (startPoint-1) && triangle[i].V[2].index <= endPoint){
+            /**
+             * @brief deleteTri函数尚未实现
+             * 
+             */
+            // DeleteTri()
+            edgeFrame.resize(0);
+            i--;
+        }
+    }
 }
